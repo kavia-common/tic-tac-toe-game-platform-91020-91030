@@ -3,7 +3,9 @@ import React, { useEffect, useMemo } from 'react';
 /**
  * BoardStatic renders the static Board screen inside React.
  * It programmatically injects CSS and JS from assets and ensures cleanup on unmount.
- * It uses the inner markup from assets/board-52-9.html (body content) and adjusts asset paths to public root.
+ * It uses the inner markup from public/assets/board-52-9.html (body content) and adjusts asset paths to public root.
+ * Note: In Create React App, any files placed under public/ are served statically at the root.
+ * So href/src like "/assets/board-52-9.css" and "/assets/board-52-9.js" must point to files in public/assets/.
  */
 
 // PUBLIC_INTERFACE
@@ -22,6 +24,10 @@ export default function BoardStatic() {
     scriptEl.src = '/assets/board-52-9.js';
     scriptEl.async = true;
     scriptEl.dataset.boardStatic = 'true';
+    scriptEl.onerror = () => {
+      // eslint-disable-next-line no-console
+      console.error('Failed to load /assets/board-52-9.js. Verify the file exists under public/assets/.');
+    };
     document.body.appendChild(scriptEl);
 
     return () => {
