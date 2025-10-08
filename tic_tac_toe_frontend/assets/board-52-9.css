@@ -1,0 +1,252 @@
+:root {
+  /* Colors derived from context or placeholders; exact figma color refs are not provided as hex in JSON */
+  --color-text-primary: #111827;
+  --bg-root: #5a1e76; /* from color_ref: color_5a1e76 - approximated as hex */
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--bg-root);
+  color: var(--color-text-primary);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+    Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", Arial, sans-serif;
+}
+
+.abs {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+.frame {
+  position: absolute;
+  image-rendering: auto;
+}
+
+/* Root Frame dimensions from JSON: width 2856 x height 1726 */
+.frame-root {
+  position: relative;
+  width: 2856px;
+  height: 1726px;
+  overflow: hidden;
+  margin: 0 auto;
+  background: var(--bg-root);
+}
+
+.bg-img {
+  z-index: 0;
+}
+
+/* "tic-tac-to" frame: x:-1431 y:-5586 width:844 height:1257
+   Because the JSON coordinates are global in Figma space and not within root local origin,
+   we position visually relative to the root for a pixel-accurate composition.
+   We'll center main content within the root and place sub-elements at exact offsets
+   computed relatively from the grid/frame images provided in the JSON. */
+.tic-tac-to {
+  /* We align primary content near the visual center; the exact Figma absolute coordinates are outside the root origin space.
+     We use the measured sub-frame offsets from their own local dimensions to compose the layout. */
+  /* Place main section roughly centered — adjust to accommodate the grid and score row as per their own absolute positions. */
+  left: 1000px;
+  top: 200px;
+  width: 844px;
+  height: 1257px;
+  z-index: 10;
+}
+
+/* Grid container: width:574 height:574 */
+.grid-container {
+  left: 135px; /* from tic-tac-to frame: x:-1296 within larger figma; approximate alignment */
+  top: 291px;
+  width: 574px;
+  height: 574px;
+  z-index: 20;
+}
+
+/* Each grid cell is 150x150 from JSON */
+.cell {
+  position: absolute;
+  width: 150px;
+  height: 150px;
+  cursor: pointer;
+  z-index: 30;
+  /* Hover state layer initially hidden, shown on hover via JS/CSS */
+}
+
+.cell .hover-layer {
+  opacity: 0;
+  transition: opacity 120ms ease-in-out;
+}
+
+.cell:hover .hover-layer,
+.cell.is-hover .hover-layer {
+  opacity: 1;
+}
+
+.cell-text {
+  position: absolute;
+  left: 49.5px; /* to match x positions of text in JSON roughly centered */
+  top: 13px;
+  width: 51px;
+  height: 124px;
+  font-size: 96px;
+  font-weight: 700;
+  line-height: 1;
+  text-align: center;
+  color: #ffffff;
+  pointer-events: none;
+}
+
+/* Place cells exactly as per their Figma coordinates within the 574x574 grid */
+#g11 { left: 0px; top: 0px; }
+#g12 { left: 178px; top: 0px; }
+#g13 { left: 356px; top: 0px; }
+
+#g21 { left: 0px; top: 178px; }
+#g22 { left: 178px; top: 178px; }
+#g23 { left: 356px; top: 178px; }
+
+#g31 { left: 0px; top: 356px; }
+#g32 { left: 178px; top: 356px; }
+#g33 { left: 356px; top: 356px; }
+
+/* Score Row: width:509 height:139, positioned under grid as per JSON */
+.score-row {
+  left: 132px;
+  top: 100px; /* start point; overridden below where specific elements are laid out */
+  width: 509px;
+  height: 139px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  z-index: 40;
+}
+
+/* Positioning the score row relative to grid: JSON shows it above the grid; we align below/above as per design image */
+.score-row {
+  top: 0px; /* inside tic-tac-to frame, anchor top; image used for exact background rendering */
+}
+
+.score-row-bg {
+  display: none; /* background image present but layout uses individual cards as per design */
+}
+
+.score-card {
+  position: relative;
+  width: 155px;
+  height: 139px;
+  border: none;
+  background: transparent;
+  padding: 0;
+  cursor: default;
+}
+
+.score-card .score-title {
+  position: absolute;
+  left: 30.5px; /* based on JSON text box offsets to center inside 155 width */
+  top: 29.5px;
+  width: 94px;
+  height: 24px;
+  font-size: 16px;
+  font-weight: 700;
+  color: #ffffff;
+  text-align: center;
+  letter-spacing: 0.5px;
+}
+
+.score-card.score-draw .score-title {
+  left: 49px;
+  width: 57px;
+}
+
+.score-card.score-o .score-title {
+  left: 30px;
+  width: 95px;
+}
+
+.score-box {
+  position: absolute;
+  left: 26.5px;
+  top: 63.5px;
+  width: 103px;
+  height: 46px;
+}
+
+.score-box .score-value {
+  position: absolute;
+  left: 37px;
+  top: -2px;
+  width: 29px;
+  height: 51px;
+  font-size: 36px;
+  font-weight: 800;
+  line-height: 51px;
+  color: #0b0b0b;
+  text-align: center;
+}
+
+/* Adjust score row placement within the tic-tac-to frame to match Figma:
+   JSON: score row frame at (x:-1264, y:-5474) relative to big figma, and grid at (x:-1296, y:-5295).
+   The difference ~ (dx=32, dy= -179) indicates the score row sits ~179px above the grid top.
+   We place score row at 112px and grid at 291px within tic-tac-to frame to maintain that spacing visually. */
+.tic-tac-to .score-row {
+  top: 112px;
+  left: 135px;
+}
+
+/* Footer Frame 1: width:267 height:54 positioned near bottom-left of root */
+.frame-1 {
+  left: 50px;
+  top: 1520px; /* visually placed near bottom within 1726px height */
+  width: 267px;
+  height: 54px;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.made-with {
+  position: absolute;
+  left: 20px;
+  top: 20px;
+  font-size: 22px;
+  line-height: 1.2;
+  color: #ffffff;
+}
+
+/* Title big text: tic. tac.toe. as decorative */
+.title-big {
+  position: absolute;
+  left: 100px;
+  top: 400px;
+  width: 750px;
+  height: 658px;
+  font-size: 160px;
+  font-weight: 900;
+  color: rgba(255, 255, 255, 0.08);
+  line-height: 1;
+  z-index: 1;
+  pointer-events: none;
+  user-select: none;
+  text-transform: lowercase;
+}
+
+/* Accessibility utility */
+[role="button"]:focus {
+  outline: 2px solid #F59E0B;
+  outline-offset: 2px;
+}
